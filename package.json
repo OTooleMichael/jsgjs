@@ -1,0 +1,24 @@
+{
+  "name": "join-select-group-js",
+  "version": "0.0.1",
+  "description": "js module for simple SQL like operations on tablular-like data (Arrays of JSON objects)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "join",
+    "group",
+    "select",
+    "sql",
+    "rows",
+    "of",
+    "json"
+  ],
+  "repository" :{ 
+    "type" : "git",
+    "url" : "https://github.com/OTooleMichael/jsgjs.git"
+  },
+  "author": "Michael O Toole",
+  "license": "MIT"
+}
