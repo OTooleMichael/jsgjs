@@ -13,6 +13,9 @@ Join Select Group-js. A small utility for performing SQL like join select and gr
   npm install jsgjs --save
 
 ## Usage
+
+# Overview
+
 A creted JSG object has 3 possible methods for manipulating data: Join, Select, Group
 Here is an example of all three used on two data sets
 
