@@ -34,7 +34,7 @@
 			return this.data
 		}
 	};
-	if(!module){
+	if(typeof module ==="undefined"){
 		SJG.prototype.export = function(functionName,alias){
 			if(!exportables[functionName]) throw "cant Export "+functionName
 			alias = alias || functionName;
@@ -525,10 +525,10 @@
 		if(!(data[0] instanceof Object)) throw "data[0] was not an object "+JSON.stringify(data[0])
 		return true
 	}
-	if(module.exports){
+	if(typeof module !=="undefined"){
 		module.exports = SJG
 	}else{
-		window._SJG = SJG
+		window.SJG = SJG
 	}
 	var exportables = {
 		Group:Group,

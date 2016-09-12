@@ -14,6 +14,13 @@ Join Select Group-js. A small utility for performing SQL like join select and gr
 
 ## Usage
 
+Node 
+	var JSG = require("jsgjs");
+
+Browser
+	<script type="text/javascript" src="/servingDirectory/jsgjs.min.js"></script>
+	var useableObject = new JSG(initData)
+	
 # Overview
 
 A creted JSG object has 3 possible methods for manipulating data: Join, Select, Group
