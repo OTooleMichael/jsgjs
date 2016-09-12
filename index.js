@@ -3,7 +3,7 @@
 		this.data = data;
 		return this
 	}
-	SJG.prototype ={
+	SJG.prototype = {
 		constructor:SJG,
 		setData:function(data){
 			this.data = data;
@@ -33,16 +33,14 @@
 		result:function(){
 			return this.data
 		}
-	}
-	if(window){
+	};
+	if(!module){
 		SJG.prototype.export = function(functionName,alias){
 			if(!exportables[functionName]) throw "cant Export "+functionName
 			alias = alias || functionName;
 			window[alias] = exportables[functionName];
 		}
 	}
-
-
 	function Join(leftSide,rightSide){
 		if(leftSide instanceof SJG){
 			this.parent = leftSide
@@ -72,7 +70,6 @@
 		this.right = rightSide;
 		return this
 	};
-
 	Join.prototype ={
 		constructor:Join,
 		getDefaultRow:function(){
@@ -92,8 +89,8 @@
 		},
 		allJoins:function(on,leftJoin,innerJoin,outterJoin){
 			this.on = on;
-			if(this.headers[on] == undefined){throw on+" is not a valid header (as per row[0]"};
-			if(this.headers[on] != "both" ){throw on+" is only found in the "+this.headers[on]+" table"};
+			if(this.headers[on] == undefined) throw on+" is not a valid header (as per row[0]";
+			if(this.headers[on] != "both")throw on+" is only found in the "+this.headers[on]+" table";
 			this.joiningObject = {};
 			return this.fillLeft().fillRight(outterJoin).flattenJoin(innerJoin).finish()
 		},
@@ -102,7 +99,7 @@
 			for(var i = 0; i< lenL; i++){
 				if( this.left[i][this.on] instanceof Object ||this.left[i][this.on] instanceof Array)throw "Row"+i+" :objects are not premitted in the joining field "+this.left[i][this.on]
 				if(this.left[i][this.on]!== null && this.left[i][this.on] !== undefined){ // dont join on null values
-					if(this.joiningObject[ this.left[i][this.on] ]  == undefined){
+					if(this.joiningObject[ this.left[i][this.on] ] == undefined){
 						this.joiningObject[ this.left[i][this.on] ] = [];
 					};
 					var row = this.getDefaultRow().fillRowLeft(this.left[i]);
@@ -127,7 +124,6 @@
 				}else{
 					if(this.joiningObject[ this.right[j][on] ] != undefined){
 						var currentLength = this.joiningObject[ this.right[j][on] ].length;
-						//var clean = parseFloat(currentLength.toString());
 						var extras = [];// to avoid mutating current length
 						for(var k = 0; k< currentLength ;k++){
 							if(this.joiningObject[ this.right[j][on] ][k].isJoined() == "both"){
@@ -162,7 +158,6 @@
 			return new SJG(this.row)
 		}
 	}
-
 	function JoinRow(JoinObject){
 		this.JoinObject = JoinObject;
 		var headers = JoinObject.headers,
@@ -193,7 +188,6 @@
 		}
 		return this
 	}
-
 	JoinRow.prototype = {
 		constructor:JoinRow,
 		isJoined:function(){
@@ -237,7 +231,6 @@
 		}
 	}
 	//////////////////////////////////
-
 	function Group(data,groupBy,fields){
 		if(data instanceof SJG){
 			this.parent = data
@@ -272,8 +265,10 @@
 					header:temp[0],
 					operations:[temp[1]||"sum"]
 				};
-			}else if(!fields.header || !fields.operations){
+			}else if(!fields[i].header || !fields[i].operations){
 				throw "Fields must be given as an array eg. [{header:x, operations:['sum','avg']} or ['x::sum','x::avg']"
+			}else{
+				oneField = fields[i];
 			}
 			if(holder[oneField.header] == undefined){
 				holder[oneField.header] = {header:oneField.header,operations:[]}
@@ -288,7 +283,6 @@
 		}
 		return output
 	}
-
 	Group.prototype = {
 		constructor:Group,
 		operate:function(){
@@ -335,7 +329,6 @@
 			return true
 		}
 	}
-
 	function GroupRow(groupByObj,row){
 		this.row = {};
 		this.tempRow ={};
@@ -529,7 +522,7 @@
 
 	function isArrayOfJSON(data){
 		if(!(data instanceof Array)) throw "data given was not an array "+JSON.stringify(data)
-		if(!(data[0] instanceof Object)) throw "data[0] was not an object"+JSON.stringify(data[0])
+		if(!(data[0] instanceof Object)) throw "data[0] was not an object "+JSON.stringify(data[0])
 		return true
 	}
 	if(module.exports){
@@ -542,9 +535,6 @@
 		Select:Select,
 		Join:Join
 	}
-})()
-
-
-
+})();
 
 
