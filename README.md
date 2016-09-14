@@ -6,26 +6,39 @@ Join Select Group-js. A small utility for performing SQL like join select and gr
 JSG js
 =========
 
-Join Select Group-js. A small utility for performing SQL like join select and group operations on Arrays of Objects in JS. With high perfomance on large data sets.
+Join Select Group-js. A small utility for performing SQL like join select and group operations on Arrays of Objects in JS. With high perfomance on large data sets. 
 
-## Installation
+Useful for front-end data manipulation and backend datastreaming and analysis without Db storage. ie. combining analytic data from an third party api wiith in house Db. 
+
+
+
+#Installation
 
   npm install jsgjs --save
 
-## Usage
+#Usage
 
-Node 
+##Node 
+	```javascript
 	var JSG = require("jsgjs");
+	``
 
-Browser
+##Browser
+	```javascript
 	<script type="text/javascript" src="/servingDirectory/jsgjs.min.js"></script>
-	var useableObject = new JSG(initData)
-	
+	var useableObject = new JSG(initData);
+	```
+---	
 # Overview
 
-A creted JSG object has 3 possible methods for manipulating data: Join, Select, Group
+A creted JSG object has 3 possible methods for manipulating data: 
+ -Join
+ -Select
+ -Group
+
 Here is an example of all three used on two data sets
 
+	```javascript
 	var JSG = require('jsgjs');
 	var users = [
 		{id:1,name:"John"},
@@ -59,53 +72,64 @@ Here is an example of all three used on two data sets
 	 { name: 'Kate', items_avg: 3, euros_spent: 101 },
 	 { name: 'Mary', items_avg: 2, euros_spent: 5 },
 	 { name: 'Michal', items_avg: NaN, euros_spent: 0 } ] }
-# JSG
-The JSG object provides routes by which to preform the join,group and select method. It stores and then removes transient data from memory. It takes one argmument which is an array of JSON objects which act as the left dataset for a join and the primary dataset other operations. 
+	```
 
+# JSG
+The JSG object provides routes by which to preform the join, group and select method. It stores and then removes transient data from memory. It takes one argmument which is an _array of JSON objects_. This act as the left dataset for a join and the primary dataset other operations.
+
+	```javascript
 	var names = [
 		{id:1,name:"Kate"},
 		{id:2,name:"Mary"},
 	];
 	var dataObject =  new JSG(names);
 	console.log( dataObject.data , dataObject.results() ) // both return the names data set
+	```
+
 
 When join , select or group methods are executed the results overwrite the previous 'data' property of the JSG object (ie. dataObject.data from above)
 
 # Join
 The Join method creates a join object on which four joins can be preformed: outterJoin, innerJoin, leftJoin and rightJoin. These mirror SQL like join in behaviour. rightJoin is simply a left join but inverts the dataSource. 
+	```javascript
+	var colours =[
+		{name:"kate",colour:"blue"},
+		{name:"john",colour:"red"},
+		{name:"james",colour:"grey"},
+	];
+	var foods =[
+		{name:"kate",colour:"chips"},
+		{name:"john",colour:"apples"},
+	];
+	var leftJoinEx = new JSG(colours).leftJoin(foods,"name").results()
+	var rightJoinEx = new JSG(foods).rightJoin(colours,"name").results()
+	
+	//leftJoinEx and rightJoinEx both return
+	//[ { name: 'kate', 'colour-left': 'blue', 'colour-right': 'chips' },
+		//{ name: 'john', 'colour-left': 'red', 'colour-right': 'apples' },
+		//{ name: 'james', 'colour-left': 'grey', 'colour-right': null } ]
+	```
 
-		var colours =[
-			{name:"kate",colour:"blue"},
-			{name:"john",colour:"red"},
-			{name:"james",colour:"grey"},
-		];
-		var foods =[
-			{name:"kate",colour:"chips"},
-			{name:"john",colour:"apples"},
-		];
-		var leftJoinEx = new JSG(colours).leftJoin(foods,"name").results()
-		var rightJoinEx = new JSG(foods).rightJoin(colours,"name").results()
-		
-		//leftJoinEx and rightJoinEx both return
-		//[ { name: 'kate', 'colour-left': 'blue', 'colour-right': 'chips' },
-  		//{ name: 'john', 'colour-left': 'red', 'colour-right': 'apples' },
-  		//{ name: 'james', 'colour-left': 'grey', 'colour-right': null } ]
+Join syntax is as follows _new JSG(dataSource1)[typeofJoin](dataSource2,"fieldToJoinOn")_
 
-Join syntax is as follows new JSG(dataSource1)[typeofJoin](dataSource2,"fieldToJoinOn")
-
-The Join field must exist in both dataSets. If names are different as in the first example
+The Join field must exist in _both dataSets_. If names are different as in the first example
 (ie join user_id and id) then a select statement or indeed a native array.map() function should be used
 
-N.B Currently the first row of each data set is used for header evaluation so ensure all relatvent headers are therein contained. There is an assumption of data validity
+*N.B Currently the first row of each data set is used for header evaluation so ensure all relatvent headers are therein contained. There is an assumption of data validity*
 
 #Select
 Select provides similar functionality to the native .map method however It provides utility in syntax and also in the context of other JSG methods
 
-It takes one argument - selectionArray
+It takes one argument - *selectionArray*
 
-each element in the selectionArray maps one column
-a selectionArray element can come in three forms: string, object of form {title:string,val:string} or   object of form {title:string,val:function}
+Each element in the selectionArray maps one column
 
+A selectionArray element can come in three forms
+1. String
+2. Object of form {title:string,val:string} 
+3. Object of form {title:string,val:function}
+
+	```javascript
 	var orders = [
 	  	{user_id:2,items:1,price_cents:100},
 	  	{user_id:2,items:5,price_cents:10000},
@@ -126,36 +150,41 @@ a selectionArray element can come in three forms: string, object of form {title:
 	// { user: 2, price_cents: 10000, price_euros: 100 },
 	// { user: 3, price_cents: 500, price_euros: 5 },
 	// { user: 1, price_cents: 1100, price_euros: 11 } ]
+	```
 
 #Group
 Group allows aggregation of data rows.
 Group takes two arguments:
-	groupBy - the field (string) or fields (array of strings) by which to group, "All" is another valid input
-	field(s) to Aggregrate: this field provides some syntax freedoms. 
+1. GroupBy
+..*The field (string) or fields (array of strings) by which to group
+..*"All" is another valid input
+2. Field(s) to Aggregrate
+..*this field provides some syntax freedoms. 
+..*the basic format is an array of objects of the form
 
-		the basic format is an array of objects of the form
-			{header:columnName::string,operators:["agerateFunctionName::string"]}
+	{header:columnName::string,operators:["agerateFunctionName::string"]}
 
-		eg:
+	eg:
 
-		[{header:"price_cents",operators:["sum","avg","count"]}]
+	[{header:"price_cents",operators:["sum","avg","count"]}]
 
-		a plain array of strings with columnName and operation seperated by the deliminator ::
-		eg:
-		 ["price_cents::sum","price_cents::avg"]
+	a plain array of strings with columnName and operation seperated by the deliminator ::
+	eg:
+	 ["price_cents::sum","price_cents::avg"]
 
-		-- this second option is parsed into the first
+	_NB : this second option is parsed into the first_
 
-Available Operators: 
-	sum - numeric values only , disregarding null values
-	avg - numeric values only , disregarding null values
-	count - all values , disregarding null values
-	unique - all values , disregarding null values
-	median - numeric values only , disregarding null values
-	mode - all values , disregarding null values
-	max - numeric values only , disregarding null values
-	min - numeric values only , disregarding null values
-			
+##Available Operators: 
+-sum - numeric values only , disregarding null values
+-avg - numeric values only , disregarding null values
+-count - all values , disregarding null values
+-unique - all values , disregarding null values
+-median - numeric values only , disregarding null values
+-mode - all values , disregarding null values
+-max - numeric values only , disregarding null values
+-min - numeric values only , disregarding null values
+	
+	```javascript		
 	var orders = [
 	  	{user_id:2,items:1,price_cents:100},
 	  	{user_id:2,items:5,price_cents:10000},
@@ -176,6 +205,7 @@ Available Operators:
 		"items::count",
 		"items::min"
 	]).results();
+	```
 
 	syntax1 and syntax2 will bring the same results 
 	ie [ { All: undefined,
