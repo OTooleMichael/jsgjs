@@ -1,6 +1,9 @@
 (function(){
 	function SJG(data){
 		this.data = data;
+		this.where = this.filter;
+		this.having = this.filter;
+		this.orderBy = this.sort;
 		return this
 	}
 	SJG.prototype = {
@@ -30,6 +33,26 @@
 		group:function(groupBy,fields){
 			return new Group(this,groupBy,fields)
 		},
+		sort:function(field,direction){
+			if(direction===undefined&&field.includes("::")){
+				direction = field.split("::")[1];
+				field = field.split("::")[0];
+			}
+			if(typeof direction == "string"){
+				direction = (direction.toLowerCase() == "desc") ? -1:1;
+			}
+			this.data = this.data.sort(dynamicSort(field,direction))
+			return this
+			function dynamicSort(field,direction) {
+	            return function (a,b) {
+	                var result = ( a[field] < b[field] ) ? -1 : (a[field]  > b[field] ) ? 1 : 0;
+	                return result * direction;
+	            }
+	        }
+		},
+		filter:function(filterFunction){
+			return new Filter(this,filterFunction)
+		},
 		result:function(){
 			return this.data
 		}
@@ -40,6 +63,18 @@
 			alias = alias || functionName;
 			window[alias] = exportables[functionName];
 		}
+	}
+	function Filter(data,filterFunction){
+		if(data instanceof SJG){
+			this.parent = data
+			data = this.parent.data;
+		}
+		var output = [];
+		data.forEach(function(ob){
+			if(filterFunction(ob)) output.push(ob)
+		});
+		if(this.parent) return this.parent.setData(output)
+		return new SJG(output)
 	}
 	function Join(leftSide,rightSide){
 		if(leftSide instanceof SJG){

@@ -110,8 +110,8 @@ var foods =[
 	{name:"kate",colour:"chips"},
 	{name:"john",colour:"apples"},
 ];
-var leftJoinEx = new JSG(colours).leftJoin(foods,"name").results()
-var rightJoinEx = new JSG(foods).rightJoin(colours,"name").results()
+var leftJoinEx = new JSG(colours).leftJoin(foods,"name").result()
+var rightJoinEx = new JSG(foods).rightJoin(colours,"name").result()
 
 //leftJoinEx and rightJoinEx both return
 //[ { name: 'kate', 'colour-left': 'blue', 'colour-right': 'chips' },
@@ -233,6 +233,49 @@ result = [ {
     items_sum: 9 
  }];
  ```
+
+## Filter (where/having)
+Remove rows that dont meet a certain test. Syntax where , filter or having may be used. The one argument is a function that returns a boolean.
+
+```javascript
+var rows = [
+	{name:"kate",age:30},
+	{name:"john",age:20},
+	{name:"kate",age:1},
+	{name:"mary"},
+];
+var filtered = new JSG(rows).filter(function(row){
+	return row.age > 10
+}).result()
+
+[
+	{name:"kate",age:30},
+	{name:"john",age:20},
+];
+```
+
+## Sort (orderBy)
+Sort the data according to one field/ column name by ascending (asc) or decending (desc)
+sort or orderBy methods can be used. The take one or two argument.
+- .sort("column","direction")
+- .sort("column::direction")
+
+```javascript
+var rows = [
+	{name:"kate",age:30},
+	{name:"john",age:20},
+	{name:"kate",age:1},
+	{name:"mary",age 16},
+];
+var sorted = new JSG(rows).sort("age::asc").result()
+var sorted = new JSG(rows).sort("age","asc").result()
+var sorted = new JSG(rows).sort("age",1).result()
+
+[ { name: 'kate', age: 1 },
+  { name: 'mary', age: 16 },
+  { name: 'john', age: 20 },
+  { name: 'kate', age: 30 } ]
+```
 
 
 ## Release History
