@@ -1,13 +1,13 @@
 (function(){
-	function SJG(data){
+	function JSG(data){
 		this.data = data;
 		this.where = this.filter;
 		this.having = this.filter;
 		this.orderBy = this.sort;
 		return this
 	}
-	SJG.prototype = {
-		constructor:SJG,
+	JSG.prototype = {
+		constructor:JSG,
 		setData:function(data){
 			this.data = data;
 			return this
@@ -58,14 +58,14 @@
 		}
 	};
 	if(typeof module ==="undefined"){
-		SJG.prototype.export = function(functionName,alias){
+		JSG.prototype.export = function(functionName,alias){
 			if(!exportables[functionName]) throw "cant Export "+functionName
 			alias = alias || functionName;
 			window[alias] = exportables[functionName];
 		}
 	}
 	function Filter(data,filterFunction){
-		if(data instanceof SJG){
+		if(data instanceof JSG){
 			this.parent = data
 			data = this.parent.data;
 		}
@@ -74,14 +74,14 @@
 			if(filterFunction(ob)) output.push(ob)
 		});
 		if(this.parent) return this.parent.setData(output)
-		return new SJG(output)
+		return new JSG(output)
 	}
 	function Join(leftSide,rightSide){
-		if(leftSide instanceof SJG){
+		if(leftSide instanceof JSG){
 			this.parent = leftSide
 			leftSide = this.parent.data;
 		}
-		if(rightSide instanceof SJG){
+		if(rightSide instanceof JSG){
 			this.parent = rightSide
 			rightSide = this.parent.data;
 		}
@@ -190,7 +190,7 @@
 		},
 		finish:function(){
 			if(this.parent) return this.parent.setData(this.rows)
-			return new SJG(this.row)
+			return new JSG(this.row)
 		}
 	}
 	function JoinRow(JoinObject){
@@ -267,7 +267,7 @@
 	}
 	//////////////////////////////////
 	function Group(data,groupBy,fields){
-		if(data instanceof SJG){
+		if(data instanceof JSG){
 			this.parent = data
 			data = this.parent.data;
 		}
@@ -341,7 +341,7 @@
 		},
 		finish:function(){
 			if(this.parent) return this.parent.setData(this.rows)
-			return new SJG(this.row)
+			return new JSG(this.row)
 		},
 		makeGroupEl:function(i){
 			var row = this.data[i];
@@ -493,7 +493,7 @@
 		}
 	}
 	function Select(data,selectionArray){
-		if(data instanceof SJG){
+		if(data instanceof JSG){
 			this.parent = data;
 			data = this.parent.data;
 		};
@@ -527,7 +527,7 @@
 		constructor:"Select",
 		finish:function(){
 			if(this.parent) return this.parent.setData(this.rows)
-			return new SJG(this.row)
+			return new JSG(this.row)
 		}
 	}
 
@@ -561,9 +561,9 @@
 		return true
 	}
 	if(typeof module !=="undefined"){
-		module.exports = SJG
+		module.exports = JSG
 	}else{
-		window.SJG = SJG
+		window.JSG = JSG
 	}
 	var exportables = {
 		Group:Group,

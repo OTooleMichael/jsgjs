@@ -265,7 +265,7 @@ var rows = [
 	{name:"kate",age:30},
 	{name:"john",age:20},
 	{name:"kate",age:1},
-	{name:"mary",age 16},
+	{name:"mary",age:16},
 ];
 var sorted = new JSG(rows).sort("age::asc").result()
 var sorted = new JSG(rows).sort("age","asc").result()
