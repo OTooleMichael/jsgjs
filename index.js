@@ -131,49 +131,43 @@
 		},
 		fillLeft:function(){
 			var lenL = this.left.length;
+			var join;
 			for(var i = 0; i< lenL; i++){
 				if( this.left[i][this.on] instanceof Object ||this.left[i][this.on] instanceof Array)throw "Row"+i+" :objects are not premitted in the joining field "+this.left[i][this.on]
-				if(this.left[i][this.on]!== null && this.left[i][this.on] !== undefined){ // dont join on null values
-					if(this.joiningObject[ this.left[i][this.on] ] == undefined){
-						this.joiningObject[ this.left[i][this.on] ] = [];
-					};
-					var row = this.getDefaultRow().fillRowLeft(this.left[i]);
-					this.joiningObject[ this.left[i][this.on] ].push(row);
-				}else{
-					console.log("row "+[i]+" tried to join on a null value! this behaviour is not permitted, the row has been removed :"+this.left[i]);
-				}
+			 	join  = (this.left[i][this.on]!== null && this.left[i][this.on] !== undefined) ?  this.left[i][this.on] : "blank_field_left" ;
+				if(this.joiningObject[ join ] == undefined){
+					this.joiningObject[ join ] = [];
+				};
+				var row = this.getDefaultRow().fillRowLeft(this.left[i]);
+				this.joiningObject[ join ].push(row);
 			};
+			this.left = null;
 			return this
 		},
 		fillRight:function(outterJoin){
 			var on = this.on;
 			var lenR = this.right.length;
+			var join;
 			for(var j= 0; j<lenR; j++){
 				if( this.right[j][this.on] instanceof Object ||this.right[j][this.on] instanceof Array)throw "Row"+j+" :objects are not premitted in the joining field: "+JSON.stringify(this.right[j][this.on]);
+			 	join  = (this.right[j][this.on]!== null && this.right[j][this.on] !== undefined) ? this.right[j][this.on] : "blank_field_right";
+				
 				if(outterJoin){
-					if(this.joiningObject[ this.right[j][on] ] == undefined){
-						this.joiningObject[ this.right[j][on] ] = []
+					if(this.joiningObject[ join ] == undefined){
+						this.joiningObject[ join ] = []
 					}
 					var row = this.getDefaultRow().fillRowRight(this.right[j]);
-					this.joiningObject[ this.right[j][on] ].push(row);	
+					this.joiningObject[ join ].push(row);	
 				}else{
-					if(this.joiningObject[ this.right[j][on] ] != undefined){
-						var currentLength = this.joiningObject[ this.right[j][on] ].length;
-						var extras = [];// to avoid mutating current length
+					if(this.joiningObject[ join ] != undefined){
+						var currentLength = this.joiningObject[ join ].length;
 						for(var k = 0; k< currentLength ;k++){
-							if(this.joiningObject[ this.right[j][on] ][k].isJoined() == "both"){
-								var row = this.joiningObject[ this.right[j][on] ][k].duplicateRow().fillRowRight(this.right[j])
-								extras.push(row); // cant push it directly or it will mutate
-							}else{
-								this.joiningObject[ this.right[j][on] ][k].fillRowRight(this.right[j]);
-							}
-						}
-						for(var l =0; l< extras.length; l++){ // save the mutation
-							this.joiningObject[ this.right[j][on] ].push(extras[l]);
+							this.joiningObject[ join ][k].fillRowRight(this.right[j]);
 						}
 					}
 				}
 			}
+			this.right = null;
 			return this
 		},
 		flattenJoin:function(inner){
@@ -181,7 +175,8 @@
 			for(var el in this.joiningObject){
 				for(var i=0;i<this.joiningObject[el].length;i++){
 					if(!inner || this.joiningObject[el][i].isJoined()=="both"){
-						this.rows.push(this.joiningObject[el][i].getRow());
+						var rows = this.joiningObject[el][i].getRows();
+						this.rows = this.rows.concat(rows);
 					}
 				}
 			}
@@ -195,41 +190,54 @@
 	}
 	function JoinRow(JoinObject){
 		this.JoinObject = JoinObject;
-		var headers = JoinObject.headers,
-			on=JoinObject.on,
-			joinableHeaders=JoinObject.joinableHeaders;
+		var on  = JoinObject.on;
 		this.joined = false;
-		this.row = {};
+		this.row = this.makeRow();
+		this.rightSides = [];
 		this.row[on]= null;
-		if(joinableHeaders.length>1){
-			for(var h in headers){
-				if(h!=on){
-					if(headers[h]=='both'){
-						var l = h+"-left",
-							r = h+"-right";
-						this.row[l]=null;
-						this.row[r]=null;
-					}else{
-						this.row[h]=null
-					}
-				}
-			}
-		}else{
-			for(var h in headers){
-				if(h!=on){
-					this.row[h]=null;
-				}
-			}
-		}
 		return this
 	}
 	JoinRow.prototype = {
 		constructor:JoinRow,
+		makeRow:function(){
+			var headers = this.JoinObject.headers,
+			on=this.JoinObject.on,
+			joinableHeaders=this.JoinObject.joinableHeaders;
+			var row = {};
+			if(joinableHeaders.length>1){
+				for(var h in headers){
+					if(h!=on){
+						if(headers[h]=='both'){
+							var l = h+"-left",
+								r = h+"-right";
+							row[l]=null;
+							row[r]=null;
+						}else{
+							row[h]=null
+						}
+					}
+				}
+			}else{
+				for(var h in headers){
+					if(h!=on){
+						row[h]=null;
+					}
+				}
+			}
+			return row
+		},
 		isJoined:function(){
 			return this.joined
 		},
 		getRow:function(){
 			return this.row
+		},
+		getRows:function(){
+			if(this.rightSides.length==0){
+				return [this.row]
+			}else{
+				return this.rightSides
+			}
 		},
 		duplicateRow:function(){
 			return new JoinRow(this.JoinObject).fillRowLeft(this.row)
@@ -254,6 +262,13 @@
 					this.row[el] = rowData[el];
 					count ++;
 				}
+			}
+			if(side == "right"){
+				var temp = {};
+				for(var el in this.row){
+					temp[el] = this.row[el];
+				}
+				this.rightSides.push(temp);
 			}
 			if(count>0){
 				if(this.joined){
