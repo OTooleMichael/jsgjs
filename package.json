@@ -1,6 +1,6 @@
 {
   "name": "jsgjs",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "js module for simple SQL like operations on tablular-like data (Arrays of JSON objects)",
   "main": "index.js",
   "scripts": {

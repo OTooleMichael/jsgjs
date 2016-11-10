@@ -53,6 +53,15 @@
 		filter:function(filterFunction){
 			return new Filter(this,filterFunction)
 		},
+		limit:function(num){
+			var out =[];
+			var i;
+			for(i=0;i<num;i++){
+				out.push(this.data[i])
+			}
+			this.data = out;
+			return this
+		},
 		result:function(){
 			return this.data
 		}
