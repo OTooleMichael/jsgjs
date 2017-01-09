@@ -523,23 +523,23 @@
 		};
 		this.data = data;
 		this.selectionArray = selectionArray;
-		this.fields = [];
-		selectionArray.forEach(function(o,i){
-			this.fields[i] = {
+		this.fields = selectionArray.map(function(o,i){
+			var out = {
 				title:null,
 				val:null,
 			};
 			if(typeof o == "string"){
-				this.fields[i].val = o;
-				this.fields[i].title = o;
+				out.val = o;
+				out.title = o;
 			}else if(!o.val){
-				this.fields[i].val = o.title;
-				this.fields[i].title = o.title;
+				out.val = o.title;
+				out.title = o.title;
 			}else{
-				this.fields[i].val = o.val;
-				this.fields[i].title = o.title;
+				out.val = o.val;
+				out.title = o.title;
 			}
-		}.bind(this));
+			return out
+		});
 		this.rows=[];
 		for(var i = 0 ; i<this.data.length;i++){
 			this.rows.push(new SelectionRow(this.fields,this.data[i]).row)
@@ -557,9 +557,8 @@
 
 	function SelectionRow(fields,data){
 		this.row = {};
-		fields = fields;
-		for(var el in fields){
-			this.row[fields[el].title] = null;
+		for(var j=0;j<fields.length;j++){
+			this.row[fields[j].title] = null;
 		}
 		for(var i = 0; i<fields.length;i++){
 			var f = fields[i];
